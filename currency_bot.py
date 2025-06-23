@@ -1,6 +1,7 @@
 import os
 import requests
 import logging
+import certifi
 from dotenv import load_dotenv
 from telegram import (
     Update,
@@ -196,7 +197,7 @@ async def convert_currency(update: Update, context: ContextTypes.DEFAULT_TYPE, a
     
     try:
         await update.message.reply_text("⏳ Fetching exchange rates...")
-        response = requests.get(f'https://api.exchangerate-api.com/v4/latest/{source}')
+        response = requests.get(f'https://api.exchangerate-api.com/v4/latest/{source}', verify=certifi.where())
         response.raise_for_status()
         data = response.json()
         rate = data['rates'][target]
