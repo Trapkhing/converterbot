@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify
 from telegram import Update
 from currency_bot import app as tg_app, bot_event_loop
 import asyncio
+import requests
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -37,3 +38,17 @@ def webhook():
 @app.route("/health", methods=["GET"])
 def health():
     return "ok", 200
+
+@app.route("/api/setup-webhook", methods=["GET"])
+def setup_webhook():
+    try:
+        url = f"https://api.telegram.org/bot{os.getenv('API_TOKEN')}/setWebhook"
+        data = {
+            "url": f"{os.getenv('WEBHOOK_URL')}/api/webhook",
+            "secret_token": os.getenv("SECRET_TOKEN")
+        }
+        resp = requests.post(url, data=data)
+        resp.raise_for_status()
+        return jsonify({"status": "ok", "message": "Webhook set successfully.", "telegram_response": resp.json()}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
