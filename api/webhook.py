@@ -30,6 +30,9 @@ def webhook():
             # In rare serverless cases, create a new loop
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
+        # Initialize the application if not already done
+        if not getattr(tg_app, '_initialized', False):
+            loop.run_until_complete(tg_app.initialize())
         loop.run_until_complete(tg_app.process_update(update))
         logger.info("Update processed successfully.")
         return '', HTTPStatus.OK
