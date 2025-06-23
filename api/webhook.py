@@ -3,14 +3,14 @@ import logging
 from http import HTTPStatus
 from flask import Flask, request, jsonify
 from telegram import Update
-from currency_bot import app
+from currency_bot import app as tg_app
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-flask_app = Flask(__name__)
+app = Flask(__name__)
 
-@flask_app.route("/api/webhook", methods=["POST"])
+@app.route("/api/webhook", methods=["POST"])
 def webhook():
     logger.info("Webhook endpoint called.")
     if request.headers.get("X-Telegram-Bot-Api-Secret-Token") != os.getenv("SECRET_TOKEN"):
@@ -19,7 +19,7 @@ def webhook():
     try:
         update_data = request.get_json()
         logger.info("Received update: %s", update_data)
-        update = Update.de_json(update_data, app.bot)
+        update = Update.de_json(update_data, tg_app.bot)
         import asyncio
         try:
             loop = asyncio.get_event_loop()
@@ -30,7 +30,7 @@ def webhook():
             # In rare serverless cases, create a new loop
             loop = asyncio.new_event_loop()
             asyncio.set_event_loop(loop)
-        loop.run_until_complete(app.process_update(update))
+        loop.run_until_complete(tg_app.process_update(update))
         logger.info("Update processed successfully.")
         return '', HTTPStatus.OK
     except Exception as e:
