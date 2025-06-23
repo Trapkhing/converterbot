@@ -33,3 +33,7 @@ def webhook():
     except Exception as e:
         logger.error("Error processing update: %s", str(e))
         return jsonify({"error": str(e)}), HTTPStatus.BAD_REQUEST
+
+@app.route("/health", methods=["GET"])
+def health():
+    return "ok", 200
