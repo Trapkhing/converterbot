@@ -50,3 +50,7 @@ async def setup_webhook():
 @fastapi_app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return "ok"
+
+@fastapi_app.get("/")
+async def root():
+    return {"status": "ok", "message": "Currency Converter Bot API"}
