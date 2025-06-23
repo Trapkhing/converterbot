@@ -1,10 +1,11 @@
 import os
 from http import HTTPStatus
-from currency_bot import app
+from telegram import Bot
 
 async def handler(request):
     try:
-        await app.bot.set_webhook(
+        bot = Bot(token=os.getenv("API_TOKEN"))
+        await bot.set_webhook(
             url=f"{os.getenv('WEBHOOK_URL')}/api/webhook",
             secret_token=os.getenv("SECRET_TOKEN")
         )
