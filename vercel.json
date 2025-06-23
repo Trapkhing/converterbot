@@ -2,15 +2,33 @@
   "version": 2,
   "functions": {
     "api/webhook.py": {
+      "runtime": "python3.9"
+    },
+    "api/setup_webhook.py": {
       "runtime": "python3.9",
       "handler": "__handler__"
     }
   },
+  "builds": [
+    {
+      "src": "api/webhook.py",
+      "use": "@vercel/python"
+    },
+    {
+      "src": "api/setup_webhook.py",
+      "use": "@vercel/python"
+    }
+  ],
   "routes": [
     {
       "src": "/api/webhook",
       "dest": "api/webhook.py",
       "methods": ["POST"]
+    },
+    {
+      "src": "/api/setup-webhook",
+      "dest": "api/setup_webhook.py",
+      "methods": ["GET"]
     }
   ]
 }
