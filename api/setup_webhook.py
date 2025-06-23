@@ -1,22 +1,17 @@
 import os
-from http import HTTPStatus
+from flask import Flask, jsonify
 from telegram import Bot
 
-async def handler(request):
+app = Flask(__name__)
+
+@app.route("/api/setup-webhook", methods=["GET"])
+def setup_webhook():
     try:
         bot = Bot(token=os.getenv("API_TOKEN"))
-        await bot.set_webhook(
+        bot.set_webhook(
             url=f"{os.getenv('WEBHOOK_URL')}/api/webhook",
             secret_token=os.getenv("SECRET_TOKEN")
         )
-        return {
-            "statusCode": HTTPStatus.OK,
-            "body": "Webhook set successfully."
-        }
+        return jsonify({"status": "ok", "message": "Webhook set successfully."}), 200
     except Exception as e:
-        return {
-            "statusCode": HTTPStatus.INTERNAL_SERVER_ERROR,
-            "body": str(e)
-        }
-
-__handler__ = handler
+        return jsonify({"status": "error", "message": str(e)}), 500
