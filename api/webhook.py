@@ -4,13 +4,12 @@ from http import HTTPStatus
 from telegram import Update
 from currency_bot import app
 
-async def handler(request):
+async def __handler__(request):
     if request.method == "POST":
-        # Security check
         if request.headers.get('X-Telegram-Bot-Api-Secret-Token') != os.getenv('SECRET_TOKEN'):
             return {
-                'statusCode': HTTPStatus.UNAUTHORIZED,
-                'body': json.dumps({'error': 'Invalid token'})
+                "statusCode": HTTPStatus.UNAUTHORIZED,
+                "body": json.dumps({'error': 'Invalid token'})
             }
 
         try:
@@ -20,11 +19,11 @@ async def handler(request):
             return {'statusCode': HTTPStatus.OK}
         except Exception as e:
             return {
-                'statusCode': HTTPStatus.BAD_REQUEST,
-                'body': json.dumps({'error': str(e)})
+                "statusCode": HTTPStatus.BAD_REQUEST,
+                "body": json.dumps({'error': str(e)})
             }
 
     return {
-        'statusCode': HTTPStatus.METHOD_NOT_ALLOWED,
-        'body': json.dumps({'error': 'Method not allowed'})
+        "statusCode": HTTPStatus.METHOD_NOT_ALLOWED,
+        "body": json.dumps({'error': 'Method not allowed'})
     }
