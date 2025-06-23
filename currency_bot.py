@@ -2,6 +2,7 @@ import os
 import requests
 import logging
 import certifi
+import asyncio
 from dotenv import load_dotenv
 from telegram import (
     Update,
@@ -307,6 +308,7 @@ async def set_webhook(application):
 
 # Initialize single application instance
 app = setup_application()
+bot_event_loop = asyncio.get_event_loop()
 
 # To set webhook (run once after deployment):
 # import asyncio; asyncio.run(set_webhook(app))

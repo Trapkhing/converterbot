@@ -3,7 +3,8 @@ import logging
 from http import HTTPStatus
 from flask import Flask, request, jsonify
 from telegram import Update
-from currency_bot import app as tg_app
+from currency_bot import app as tg_app, bot_event_loop
+import asyncio
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -20,20 +21,13 @@ def webhook():
         update_data = request.get_json()
         logger.info("Received update: %s", update_data)
         update = Update.de_json(update_data, tg_app.bot)
-        import asyncio
-        try:
-            loop = asyncio.get_event_loop()
-        except RuntimeError:
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-        if loop.is_running():
-            # In rare serverless cases, create a new loop
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
         # Initialize the application if not already done
         if not getattr(tg_app, '_initialized', False):
-            loop.run_until_complete(tg_app.initialize())
-        loop.run_until_complete(tg_app.process_update(update))
+            future = asyncio.run_coroutine_threadsafe(tg_app.initialize(), bot_event_loop)
+            future.result()
+        # Process the update in the bot's event loop
+        future = asyncio.run_coroutine_threadsafe(tg_app.process_update(update), bot_event_loop)
+        future.result()
         logger.info("Update processed successfully.")
         return '', HTTPStatus.OK
     except Exception as e:
