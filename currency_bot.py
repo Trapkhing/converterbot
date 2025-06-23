@@ -308,7 +308,8 @@ async def set_webhook(application):
 
 # Initialize single application instance
 app = setup_application()
-bot_event_loop = asyncio.get_event_loop()
+bot_event_loop = asyncio.new_event_loop()
+asyncio.set_event_loop(bot_event_loop)
 
 # To set webhook (run once after deployment):
 # import asyncio; asyncio.run(set_webhook(app))
