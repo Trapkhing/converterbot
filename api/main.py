@@ -47,6 +47,6 @@ async def setup_webhook():
     except Exception as e:
         return {"status": "error", "message": str(e)}
 
-@fastapi_app.get("/health")
+@fastapi_app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     return "ok"
