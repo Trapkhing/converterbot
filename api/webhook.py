@@ -1,31 +1,30 @@
 import json
-from http import HTTPStatus
-from currency_bot import app
-from telegram import Update
 import os
+from http import HTTPStatus
+from telegram import Update
+from currency_bot import app
 
 async def handler(request):
     if request.method == "POST":
-        # Get the secret token from headers
-        incoming_token = request.headers.get('X-Telegram-Bot-Api-Secret-Token')
-        expected_token = os.getenv('SECRET_TOKEN')
-        
-        # Verify the token
-        if incoming_token != expected_token:
+        # Security check
+        if request.headers.get('X-Telegram-Bot-Api-Secret-Token') != os.getenv('SECRET_TOKEN'):
             return {
                 'statusCode': HTTPStatus.UNAUTHORIZED,
-                'body': json.dumps({'status': 'unauthorized'})
+                'body': json.dumps({'error': 'Invalid token'})
             }
-        
-        # Process the update
-        update = Update.de_json(await request.json(), app.bot)
-        await app.process_update(update)
-        return {
-            'statusCode': HTTPStatus.OK,
-            'body': json.dumps({'status': 'ok'})
-        }
-    
+
+        try:
+            update_data = await request.json()
+            update = Update.de_json(update_data, app.bot)
+            await app.process_update(update)
+            return {'statusCode': HTTPStatus.OK}
+        except Exception as e:
+            return {
+                'statusCode': HTTPStatus.BAD_REQUEST,
+                'body': json.dumps({'error': str(e)})
+            }
+
     return {
         'statusCode': HTTPStatus.METHOD_NOT_ALLOWED,
-        'body': json.dumps({'status': 'method not allowed'})
+        'body': json.dumps({'error': 'Method not allowed'})
     }

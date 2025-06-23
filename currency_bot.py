@@ -31,6 +31,10 @@ API_TOKEN = os.getenv('API_TOKEN')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
 
+print("API_TOKEN:", API_TOKEN)
+print("WEBHOOK_URL:", WEBHOOK_URL)
+print("SECRET_TOKEN:", SECRET_TOKEN)
+
 if not all([API_TOKEN, WEBHOOK_URL]):
     logger.error("Missing required environment variables")
     exit(1)
@@ -277,6 +281,19 @@ def setup_application():
     application.add_handler(CallbackQueryHandler(handle_callback))
     
     return application
+
+
+async def set_webhook():
+    """Set up the webhook programmatically"""
+    application = Application.builder().token(API_TOKEN).build()
+    await application.bot.set_webhook(
+        url=f"{WEBHOOK_URL}/api/webhook",
+        secret_token=SECRET_TOKEN
+    )
+
+    
+# Initialize webhook (call this once after deployment)
+import asyncio; asyncio.run(set_webhook())
 
 # Global application instance
 app = setup_application()
