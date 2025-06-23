@@ -282,18 +282,15 @@ def setup_application():
     
     return application
 
-
-async def set_webhook():
-    """Set up the webhook programmatically"""
-    application = Application.builder().token(API_TOKEN).build()
+async def set_webhook(application):
+    """Configure webhook for an existing application"""
     await application.bot.set_webhook(
         url=f"{WEBHOOK_URL}/api/webhook",
         secret_token=SECRET_TOKEN
     )
 
-    
-# Initialize webhook (call this once after deployment)
-import asyncio; asyncio.run(set_webhook())
-
-# Global application instance
+# Initialize single application instance
 app = setup_application()
+
+# To set webhook (run once after deployment):
+# import asyncio; asyncio.run(set_webhook(app))
