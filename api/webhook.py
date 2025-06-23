@@ -5,7 +5,6 @@ from flask import Flask, request, jsonify
 from telegram import Update
 from currency_bot import app as tg_app, bot_event_loop
 import asyncio
-import threading
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -22,19 +21,14 @@ def webhook():
         update_data = request.get_json()
         logger.info("Received update: %s", update_data)
         update = Update.de_json(update_data, tg_app.bot)
-        def process():
-            try:
-                # Initialize the application if not already done
-                if not getattr(tg_app, '_initialized', False):
-                    future = asyncio.run_coroutine_threadsafe(tg_app.initialize(), bot_event_loop)
-                    future.result()
-                # Process the update in the bot's event loop
-                future = asyncio.run_coroutine_threadsafe(tg_app.process_update(update), bot_event_loop)
-                future.result()
-                logger.info("Update processed successfully in background.")
-            except Exception as e:
-                logger.error("Error processing update in background: %s", str(e))
-        threading.Thread(target=process).start()
+        # Initialize the application if not already done
+        if not getattr(tg_app, '_initialized', False):
+            future = asyncio.run_coroutine_threadsafe(tg_app.initialize(), bot_event_loop)
+            future.result()
+        # Process the update in the bot's event loop
+        future = asyncio.run_coroutine_threadsafe(tg_app.process_update(update), bot_event_loop)
+        future.result()
+        logger.info("Update processed successfully.")
         return '', HTTPStatus.OK
     except Exception as e:
         logger.error("Error processing update: %s", str(e))
