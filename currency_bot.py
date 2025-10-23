@@ -33,10 +33,6 @@ API_TOKEN = os.getenv('API_TOKEN')
 WEBHOOK_URL = os.getenv('WEBHOOK_URL')
 SECRET_TOKEN = os.getenv('SECRET_TOKEN')
 
-print("API_TOKEN:", API_TOKEN)
-print("WEBHOOK_URL:", WEBHOOK_URL)
-print("SECRET_TOKEN:", SECRET_TOKEN)
-
 if not all([API_TOKEN, WEBHOOK_URL]):
     logger.error("Missing required environment variables")
     exit(1)
@@ -47,6 +43,7 @@ CURRENCIES = {
     'EUR': '🇪🇺 Euro',
     'GBP': '🇬🇧 British Pound',
     'GHS': '🇬🇭 Ghanaian Cedi',
+    'NGN': '🇳🇬 Nigerian Naira',
     'CAD': '🇨🇦 Canadian Dollar',
     'AUD': '🇦🇺 Australian Dollar'
 }
@@ -57,7 +54,8 @@ def get_currency_keyboard():
     buttons = [
         [KeyboardButton(f"{CURRENCIES['USD']}"), KeyboardButton(f"{CURRENCIES['EUR']}")],
         [KeyboardButton(f"{CURRENCIES['GBP']}"), KeyboardButton(f"{CURRENCIES['GHS']}")],
-        [KeyboardButton(f"{CURRENCIES['CAD']}"), KeyboardButton(f"{CURRENCIES['AUD']}")]
+        [KeyboardButton(f"{CURRENCIES['NGN']}"), KeyboardButton(f"{CURRENCIES['CAD']}")],
+        [KeyboardButton(f"{CURRENCIES['AUD']}")]
     ]
     return ReplyKeyboardMarkup(buttons, resize_keyboard=True, one_time_keyboard=True)
 
@@ -310,6 +308,3 @@ async def set_webhook(application):
 app = setup_application()
 bot_event_loop = asyncio.new_event_loop()
 asyncio.set_event_loop(bot_event_loop)
-
-# To set webhook (run once after deployment):
-# import asyncio; asyncio.run(set_webhook(app))
